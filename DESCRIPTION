@@ -1,0 +1,21 @@
+Package: GBcurves
+Type: Package
+Title: Downloads and interpolates zero-coupon bond yield curves of Brazil, China, and Russia.
+Version: 0.1.0
+Author: Werley Cordeiro
+Maintainer: Werley Cordeiro <werleycordeiro@gmail.com>
+Description: Downloads and interpolates the Brazilian, Chinese, and Russian zero-coupon bond yield curves.
+License: GPL-2
+LazyData: true
+Imports:
+  curl,
+  functional,
+  httr,
+  readxl,
+  rvest,
+  utils,
+  xml2,
+  xts
+Suggests:
+  knitr
+RoxygenNote: 6.1.1.9000
