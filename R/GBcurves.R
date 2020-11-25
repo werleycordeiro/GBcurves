@@ -7,7 +7,7 @@
 #' @param init initial date in format "YYYY-MM-DD"
 #' @param fin final date in format "YYYY-MM-DD"
 #' @param mty maturities specified by months
-#' @param ctry countries availables: "BR","CH" or"RU"
+#' @param ctry countries availables: "BR","CN" or"RU"
 #'
 #' @return A matrix that contains daily zero-coupon bond yield curves in percent in each row and maturities in months by columns.
 #'
@@ -49,9 +49,9 @@ yields = function (init,fin,mty,ctry) {
     stop(paste('Input \"mty\" must be a vector with integers'))
   }
 
-  tmp <- c("BR","RU","CH")[c("BR","RU","CH") == ctry]
+  tmp <- c("BR","RU","CN")[c("BR","RU","CN") == ctry]
   if ( identical(tmp, character(0)) ) {
-    stop(paste('Input \"ctry\" not valid. It should be \"BR\", \"CH\" or \"RU\"'))
+    stop(paste('Input \"ctry\" not valid. It should be \"BR\", \"CN\" or \"RU\"'))
   }
 
   if ( fin > Sys.Date() ) {
@@ -99,9 +99,9 @@ yields = function (init,fin,mty,ctry) {
     return(mat)
   }
 
-  # CH
+  # CN
 
-  if ( ctry == "CH" ) {
+  if ( ctry == "CN" ) {
 
     if ( init < "2006-03-01" ) {
       stop(paste('\"init\" must be >= "2006-03-01" for China yield curves.',
