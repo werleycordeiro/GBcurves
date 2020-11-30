@@ -8,17 +8,7 @@ Description: Downloads and interpolates the Brazilian, Chinese, and Russian zero
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
-Imports:
-  curl,
-  functional,
-  httr,
-  magrittr,
-  readxl,
-  rvest,
-  stats,
-  utils,
-  xml2,
-  xts
+Imports: curl, functional, httr, magrittr, readxl, rvest, stats, utils, xml2, xts
 Suggests:
   knitr
 RoxygenNote: 6.1.1.9000
