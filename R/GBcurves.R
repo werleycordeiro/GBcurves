@@ -1,24 +1,24 @@
 #' @title Zero-coupon bond yield curves data
 #'
-#' @description This function downloads daily zero-coupon bond yield curves data sets. If necessary, it interpolates with spline function for unavailable maturities.
+#' @description This function downloads daily zero-coupon bond yield curves data of Brazil, China, and Russia. If necessary, it interpolates with spline function for unavailable maturities.
 #'
 #' @Usage yields(init, fin, mty, ctry)
 #'
 #' @param init initial date in format "YYYY-MM-DD"
 #' @param fin final date in format "YYYY-MM-DD"
 #' @param mty maturities specified by months
-#' @param ctry countries availables: "BR","CN" or"RU"
+#' @param ctry countries available: "BR", "CN" or "RU"
 #'
 #' @return A matrix that contains daily zero-coupon bond yield curves in percent in each row and maturities in months by columns.
 #'
-#' @source The data sets of Brazil, China, and Russia are obtained from <http://www.b3.com.br/>, <http://yield.chinabond.com.cn>, and <https://www.cbr.ru>, respectively.
+#' @source The dataset of Brazil, China, and Russia are obtained from <http://www.b3.com.br/>, <http://yield.chinabond.com.cn>, and <https://www.cbr.ru>, respectively.
 #'
 #' @examples
 #'
-#'init = "2020-05-10"
-#'fin = "2020-05-17"
-#'mty = c(3,6,12,120,360)
-#'ctry = "BR"
+#'init <- "2020-05-10"
+#'fin <- "2020-05-17"
+#'mty <- c(3,6,12,120,360)
+#'ctry <- "BR"
 #'
 #'\dontrun{
 #'yields(init = init, fin = fin, mty = mty, ctry = ctry)
@@ -32,9 +32,6 @@ yields = function (init,fin,mty,ctry) {
   if (!test.internet) {
     stop('No internet connection found...')
   }
-
-  # Packages
-  suppressMessages(library(functional)) # vai sair...
 
   if ( is.na(as.Date(as.character(init), format = '%Y-%m-%d') ) | is.na(as.Date(as.character(fin), format = '%Y-%m-%d'))) {
     stop(paste('Inputs \"init\" and \"fin\" must be a string with the standard date format (YYYY-MM-DD)'))

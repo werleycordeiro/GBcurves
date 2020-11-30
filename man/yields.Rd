@@ -4,7 +4,7 @@
 \alias{yields}
 \title{Zero-coupon bond yield curves data}
 \source{
-The data sets of Brazil, China, and Russia are obtained from <http://www.b3.com.br/>, <http://yield.chinabond.com.cn>, and <https://www.cbr.ru>, respectively.
+The dataset of Brazil, China, and Russia are obtained from <http://www.b3.com.br/>, <http://yield.chinabond.com.cn>, and <https://www.cbr.ru>, respectively.
 }
 \usage{
 yields(init, fin, mty, ctry)
@@ -16,20 +16,20 @@ yields(init, fin, mty, ctry)
 
 \item{mty}{maturities specified by months}
 
-\item{ctry}{countries availables: "BR","CH" or"RU"}
+\item{ctry}{countries available: "BR", "CN" or "RU"}
 }
 \value{
 A matrix that contains daily zero-coupon bond yield curves in percent in each row and maturities in months by columns.
 }
 \description{
-This function downloads daily zero-coupon bond yield curves data sets. If necessary, it interpolates with spline function for unavailable maturities.
+This function downloads daily zero-coupon bond yield curves data of Brazil, China, and Russia. If necessary, it interpolates with spline function for unavailable maturities.
 }
 \examples{
 
-init = "2020-05-10"
-fin = "2020-05-17"
-mty = c(3,6,12,120,360)
-ctry = "BR"
+init <- "2020-05-10"
+fin <- "2020-05-17"
+mty <- c(3,6,12,120,360)
+ctry <- "BR"
 
 \dontrun{
 yields(init = init, fin = fin, mty = mty, ctry = ctry)
