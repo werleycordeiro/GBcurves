@@ -1,15 +1,15 @@
-#' @title Zero-coupon bond yield curves data
+#' @title Yield Curves Dataset
 #'
-#' @description This function downloads daily zero-coupon bond yield curves data of Brazil, China, and Russia. If necessary, it interpolates with spline function for unavailable maturities.
+#' @description This function downloads daily yield curves data of Brazil, China, and Russia. If necessary, it interpolates with spline function for unavailable maturities.
 #'
-#' @Usage yields(init, fin, mty, ctry)
+#' @usage yields(init, fin, mty, ctry)
 #'
-#' @param init initial date in format "YYYY-MM-DD"
-#' @param fin final date in format "YYYY-MM-DD"
-#' @param mty maturities specified by months
-#' @param ctry countries available: "BR", "CN" or "RU"
+#' @param init Initial date in format "YYYY-MM-DD"
+#' @param fin Final date in format "YYYY-MM-DD"
+#' @param mty Maturities specified by months
+#' @param ctry Countries available: "BR", "CN" or "RU"
 #'
-#' @return A matrix that contains daily zero-coupon bond yield curves in percent in each row and maturities in months by columns.
+#' @return A matrix that contains daily yield curves in percent in each row and maturities in months by columns.
 #'
 #' @source The dataset of Brazil, China, and Russia are obtained from <http://www.b3.com.br/>, <http://yield.chinabond.com.cn>, and <https://www.cbr.ru>, respectively.
 #'
@@ -82,16 +82,16 @@ yields = function (init,fin,mty,ctry) {
         # Spline
         t <- as.integer(as.matrix(data[,1])) / 21
         y <- as.numeric(as.matrix(data[,2]))
-        spl <- smooth.spline(y ~ t, all.knots = FALSE)
+        spl <- stats::smooth.spline(y ~ t, all.knots = FALSE)
         t.new <- mty
-        new <- predict(spl, t.new)
+        new <- stats::predict(spl, t.new)
         mat[i,] <- new$y
       }
       i <- i + 1
     }
     colnames(mat) <- paste0("M",mty)
     rownames(mat) <- dates
-    mat <- na.omit(mat)
+    mat <- stats::na.omit(mat)
     attributes(mat)$na.action <- NULL
     return(mat)
   }
@@ -126,12 +126,12 @@ yields = function (init,fin,mty,ctry) {
         # tmp1.new[1] = 1 / 252
         y <- as.numeric(as.matrix(mat0[,3]))
         # spl <- smooth.spline(y ~ tmp1.new,all.knots=TRUE,control.spar = list(tol=1e-4, eps= 0.01))
-        spl <- smooth.spline(y ~ tmp1.new, cv = TRUE)
+        spl <- stats::smooth.spline(y ~ tmp1.new, cv = TRUE)
         tmp1 <- mty
-        while ( tail(tmp1, n = 1) > tail(tmp1.new, n = 1) ) {# remove latest maturities not observed
+        while ( utils::tail(tmp1, n = 1) > utils::tail(tmp1.new, n = 1) ) {# remove latest maturities not observed
           tmp1 <- tmp1[-length(tmp1)]
         }
-        new <- predict(spl, tmp1)
+        new <- stats::predict(spl, tmp1)
         mat[i, ] <- new$y
         if ( length(tmp1) != length(mty) ) mat[i, (length(tmp1)+1):length(mty)] = -Inf
       } else {
@@ -141,7 +141,7 @@ yields = function (init,fin,mty,ctry) {
     }
     colnames(mat) <- paste0("M",mty)
     rownames(mat) <- format(seq(as.Date(init), as.Date(fin), 'day'), format = "%d-%m-%Y", tz = "UTC")
-    mat = na.omit(mat)
+    mat = stats::na.omit(mat)
     attributes(mat)$na.action <- NULL
     mat[mat == -Inf] <- NA
     return(mat)
@@ -170,8 +170,8 @@ yields = function (init,fin,mty,ctry) {
       if ( data[1] == dates[i] ) {
         if ( NA %in% match(mty,mty.def) ) {
           # Spline
-          spl <- smooth.spline( as.numeric(data[2:13]) ~ mty.def, all.knots = FALSE )
-          new <- predict(spl, mty)
+          spl <- stats::smooth.spline( as.numeric(data[2:13]) ~ mty.def, all.knots = FALSE )
+          new <- stats::predict(spl, mty)
           mat[i, 2:(length(mty) + 1) ] <- new$y
           mat[i, 1] <- data[1]
         } else {
@@ -183,7 +183,7 @@ yields = function (init,fin,mty,ctry) {
     mat <- matrix(as.numeric(mat[,2:ncol(mat)]),nrow(mat),(ncol(mat)-1))
     rownames(mat) <- format(seq(as.Date(init), as.Date(fin), 'day'), format="%d-%m-%Y", tz="UTC")
     colnames(mat) <- paste0("M",mty)
-    mat <- na.omit(mat)
+    mat <- stats::na.omit(mat)
     attributes(mat)$na.action <- NULL
     return(mat)
   }

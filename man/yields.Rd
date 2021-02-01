@@ -2,7 +2,7 @@
 % Please edit documentation in R/GBcurves.R
 \name{yields}
 \alias{yields}
-\title{Zero-coupon bond yield curves data}
+\title{Yield Curves Dataset}
 \source{
 The dataset of Brazil, China, and Russia are obtained from <http://www.b3.com.br/>, <http://yield.chinabond.com.cn>, and <https://www.cbr.ru>, respectively.
 }
@@ -10,19 +10,19 @@ The dataset of Brazil, China, and Russia are obtained from <http://www.b3.com.br
 yields(init, fin, mty, ctry)
 }
 \arguments{
-\item{init}{initial date in format "YYYY-MM-DD"}
+\item{init}{Initial date in format "YYYY-MM-DD"}
 
-\item{fin}{final date in format "YYYY-MM-DD"}
+\item{fin}{Final date in format "YYYY-MM-DD"}
 
-\item{mty}{maturities specified by months}
+\item{mty}{Maturities specified by months}
 
-\item{ctry}{countries available: "BR", "CN" or "RU"}
+\item{ctry}{Countries available: "BR", "CN" or "RU"}
 }
 \value{
-A matrix that contains daily zero-coupon bond yield curves in percent in each row and maturities in months by columns.
+A matrix that contains daily yield curves in percent in each row and maturities in months by columns.
 }
 \description{
-This function downloads daily zero-coupon bond yield curves data of Brazil, China, and Russia. If necessary, it interpolates with spline function for unavailable maturities.
+This function downloads daily yield curves data of Brazil, China, and Russia. If necessary, it interpolates with spline function for unavailable maturities.
 }
 \examples{
 
