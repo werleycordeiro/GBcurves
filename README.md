@@ -1,11 +1,18 @@
-# GBcurves
+# The GBcurves Package
 
+The GBcurves for R downloads and interpolates the Brazilian, Chinese, and Russian yield curves directly 
+from <http://www.b3.com.br/>, <http://yield.chinabond.com.cn>, and <https://www.cbr.ru>, respectively.
 
-```R
-install.packages("devtools") # Step 1
-library(devtools) # Step 2
-devtools::install_git("https://github.com/werleycordeiro/GBcurves") # Step 3
-library(GBcurves) # Step 4
+The canonical link to the package on CRAN which includes examples and
+documentation is [https://cran.r-project.org/web/packages/GBcurves/index.html](https://cran.r-project.org/web/packages/GBcurves/index.html).
+
+Development can be tracked via the [github repository](https://github.com/werleycordeiro/GBcurves) 
+which contains source code for the package starting with version 0.1.0.
+
+The latest developmental release canbe installed with 
+
+```
+install.packages("GBcurves")
 
 # Example: 
 
@@ -15,3 +22,5 @@ mty <- c(3,6,12,120,360)
 ctry <- "BR"
 
 yields(init = init, fin = fin, mty = mty, ctry = ctry)
+
+```
