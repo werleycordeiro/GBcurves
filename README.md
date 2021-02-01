@@ -9,8 +9,6 @@ documentation is [https://cran.r-project.org/web/packages/GBcurves/index.html](h
 Development can be tracked via the [github repository](https://github.com/werleycordeiro/GBcurves) 
 which contains source code for the package starting with version 0.1.0.
 
-The latest developmental release canbe installed with 
-
 ```
 install.packages("GBcurves")
 
