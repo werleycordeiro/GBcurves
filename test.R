@@ -9,7 +9,7 @@ check_url <- function(url, tmp){
         },
         warning = function(w){
           return('problem')
-          message('')
+          message(paste("It was not possible to download the date ",dates[i],". Try again, or the date ",dates[i]," is not available."))
         }#,
       )
       return(out)
