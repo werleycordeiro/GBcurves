@@ -1,6 +1,6 @@
 # The GBcurves Package
 
-The GBcurves for R downloads and interpolates the Brazilian, Chinese, and Russian yield curves directly 
+The GBcurves for R downloads the Brazilian, Chinese, and Russian yield curves directly 
 from <https://www.b3.com.br/>, <https://www.chinabond.com.cn/>, and <https://www.cbr.ru/>, respectively.
 
 The canonical link to the package on CRAN which includes examples and
