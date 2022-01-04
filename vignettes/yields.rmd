@@ -1,5 +1,5 @@
 ---
-title: "Downloading yield curves with GBcurves"
+title: "Downloading yield curves"
 author: "Werley Cordeiro"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -15,7 +15,7 @@ This is a short document on getting up to speed with `GBcurves` quickly.
 
 ## Downloading dataset ##
 
-Version 0.1.0 of `GBcurves` makes it possible to download yield curves of Brazil, China, and Russia. The data comprises daily observed yields per maturities. If necessary, it interpolates with `smooth.spline` function for unavailable maturities.
+Version 0.1.6 of `GBcurves` makes it possible to download yield curves of Brazil, China, and Russia. The data comprises daily observed yields per maturities. It interpolates with `smooth.spline` function for unavailable maturities for Brazil only.
 
 ### Example
 
@@ -23,7 +23,7 @@ Here's an example of usage that will download yield curves of Brazil:
 
 ```{r notrun, eval=FALSE}
 library(GBcurves)
-init <- "2020-05-10" # YYYY-MM-DD
+init <- "2020-05-11" # YYYY-MM-DD
 fin <- "2020-05-17" # YYYY-MM-DD
 mty <- c(3,6,12,120,360) # must be in months
 ctry <- "BR"
@@ -35,7 +35,7 @@ df.out <- yields(init = init,
 
 ### Brazil (BR)
 
-The database consists of a panel of daily time series of zero yields from the closing prices of the future interbank deposit (future DI) from the [B3 - Brazil Stock Exchange and Over-the-Counter Market](http://www.b3.com.br/). 
+The database consists of a panel of daily time series of zero yields from the closing prices of the future interbank deposit (future DI) from the [B3 - Brazil Stock Exchange and Over-the-Counter Market](https://www.b3.com.br/). 
 
 The DI rate is the average daily rate of Brazilian interbank deposits (borrowing/lending), calculated by the Clearinghouse for Custody and Settlements (CETIP) for all business days.  The DI rate is expressed in annually compounded terms, based on 252 business days.
 
@@ -45,12 +45,12 @@ In  general,  there  are  around  20  maturities  with  authorized  contracts  e
 
 The database consists of a panel of daily time series of ChinaBond Government Bond Yield Curve (YTM), values (% per annum).
 
-The available maturities (in years) are `(0,0.08,0.17,0.25,0.5,0.75,1,2,3,5,7,10,15,20,30,40,50)`.
+The available maturities (in months) are `(0.96, 2.04, 3, 6, 9, 12, 24, 36, 60, 84, 120, 180, 240, 360, 480, 600)`.
 
-Visit [ChinaBond](http://yield.chinabond.com.cn/cbweb-mn/yield_main?locale=en_US) for more information on legislation and instructions.
+Visit [ChinaBond](https://www.chinabond.com.cn/) for more information on legislation and instructions.
 
 ### Russia (RU)
 
-The database consists of a panel of daily time series of [Russian government bond zero-coupon yield curve](https://www.cbr.ru/eng/hd_base/zcyc_params/), values (% per annum).
+The database consists of a panel of daily time series of [Russian government bond zero-coupon yield curve](https://www.cbr.ru/), values (% per annum).
 
 The available maturities (in months) are `(3,6,9,12,24,36,60,84,120,180,240,360)`.

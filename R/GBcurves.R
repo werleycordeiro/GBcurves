@@ -87,6 +87,8 @@ yields = function (init,fin,mty,ctry) {
         new <- stats::predict(spl, t.new)
         mat[i,] <- new$y
       }
+      #pb = utils::txtProgressBar(min = (1/length(dates)), max = length(dates), style = 3)
+      #utils::setTxtProgressBar(pb,i)
       i <- i + 1
     }
     colnames(mat) <- paste0("M",mty)
@@ -99,57 +101,155 @@ yields = function (init,fin,mty,ctry) {
   # CN
 
   if ( ctry == "CN" ) {
+    message("Interpolation not available")
 
     if ( init < "2006-03-01" ) {
       stop(paste('\"init\" must be >= "2006-03-01" for China yield curves.',
                  'Please check it.'))
     }
 
-
     dates <- format(seq(as.Date(init), as.Date(fin), 'day'), format="%Y-%m-%d", tz="UTC")
     if ( !identical(mty[mty < 0 | mty > 600], numeric(0)) ) {
         stop(paste0('argument \"mty\" must be between 0 and 600 months for ',ctry, ' yield curves'))
       }
-    mat <- matrix(NA,length(dates),length(mty))
+    dataset.raw <- list()
+    store <- matrix(NA,length(dates),2)
+
+
+    if(Sys.info()['sysname'] == 'Linux' ||Sys.info()['sysname'] == 'SunOS' ||Sys.info()['sysname'] == 'Darwin'){
+      options(HTTPUserAgent = "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6;
+      en-US; rv:1.9.2.12) Gecko/20101026 Firefox/3.6.12")
+    }
+
+    # function check_url
+
+    check_url <- function(url, tmp){
+      if( R.Version()$nickname=="Unsuffered Consequences" ){
+        try(
+
+            utils::download.file(url = url, destfile = tmp, mode="wb", quiet = TRUE, method = "wininet")
+
+      )
+
+      }else{
+
+        out=tryCatch(
+          expr = {
+
+            utils::download.file(url = url, destfile = tmp, mode="wb", quiet = TRUE)
+
+          },
+          error = function(e){
+            message(paste("It was not possible to download the date ",dates[i],". Try again, or the date ",dates[i]," is not available."))
+            return('problem')
+          },
+          warning = function(w){
+            return('problem')
+            message('')
+          }#,
+        )
+
+        return(out)
+
+      }
+
+    }
+
     # Scraping
     i <- 1
     while ( i <= length(dates) ) {
       tmp <- tempfile(fileext = ".xlsx")
       url <- paste0("http://yield.chinabond.com.cn/cbweb-mn/yc/downBzqxDetail?ycDefIds=2c9081e50a2f9606010a3068cae70001&&zblx=txy&&workTime=",
-                   dates[i],
-                   "&&dxbj=0&&qxlx=0,&&yqqxN=N&&yqqxK=K&&wrjxCBFlag=0&&locale=en_US")
-      utils::download.file(url = url, destfile = tmp, mode="wb", quiet = TRUE)
-      if ( !file.info(tmp)$size == 0 ) {
-        mat0 <- readxl::read_excel(tmp)
-        # Spline
-        tmp1.new <- as.numeric(as.matrix(mat0[,2])) * 12
-        # tmp1.new[1] = 1 / 252
-        y <- as.numeric(as.matrix(mat0[,3]))
-        # spl <- smooth.spline(y ~ tmp1.new,all.knots=TRUE,control.spar = list(tol=1e-4, eps= 0.01))
-        spl <- stats::smooth.spline(y ~ tmp1.new, cv = TRUE)
-        tmp1 <- mty
-        while ( utils::tail(tmp1, n = 1) > utils::tail(tmp1.new, n = 1) ) {# remove latest maturities not observed
-          tmp1 <- tmp1[-length(tmp1)]
+                    dates[i],
+                    "&&dxbj=0&&qxlx=0,&&yqqxN=N&&yqqxK=K&&wrjxCBFlag=0&&locale=en_US")
+
+      test <- check_url(url = url, tmp = tmp) # return 'problem' or 0. If 0, tmp size can be 0 or != 0
+
+      if(test == 0){ # If = 0, great, it downloaded the date, but we don't know the file size ...
+
+          if ( file.info(tmp)$size != 0 ) { # check file size
+
+            mat0 <- readxl::read_excel(tmp)
+            tmp1.new <- as.numeric(as.matrix(mat0[,2])) # Maturities from source
+            store[i,] <- c(i,length(tmp1.new))
+            y <- as.numeric(as.matrix(mat0[,3])) # Yields from source
+            dataset.raw[[i]] <- data.frame(tmp1.new,y)
+
+          }else{
+
+            dataset.raw[[i]] <- NA
+
+          }
+
+      }else{
+
+        if ( !is.na( file.info(tmp)$size ) ) { # check file size
+
+          mat0 <- readxl::read_excel(tmp)
+          tmp1.new <- as.numeric(as.matrix(mat0[,2])) # Maturities from source
+          store[i,] <- c(i,length(tmp1.new))
+          y <- as.numeric(as.matrix(mat0[,3])) # Yields from source
+          dataset.raw[[i]] <- data.frame(tmp1.new,y)
+
+        }else{
+
+          dataset.raw[[i]] <- NA
+
         }
-        new <- stats::predict(spl, tmp1)
-        mat[i, ] <- new$y
-        if ( length(tmp1) != length(mty) ) mat[i, (length(tmp1)+1):length(mty)] = -Inf
-      } else {
-        dates[i] <- NA
+
       }
+
       i <- i + 1
+      #pb = txtProgressBar(min = (1/length(dates)), max = length(dates), style = 3)
+      #setTxtProgressBar(pb,i)
+
     }
-    colnames(mat) <- paste0("M",mty)
-    rownames(mat) <- format(seq(as.Date(init), as.Date(fin), 'day'), format = "%d-%m-%Y", tz = "UTC")
-    mat = stats::na.omit(mat)
-    attributes(mat)$na.action <- NULL
-    mat[mat == -Inf] <- NA
-    return(mat)
+
+    store <- stats::na.omit(store)
+    max.mty <- store[store[,2]==max(store[,2]),]
+
+    if( !is.character(max.mty[1]) && !is.null(max.mty[1]) && !is.na(max.mty[1])){
+
+      max.mty <- as.numeric(max.mty[1])
+      mat.final <- matrix(NA, length(dates), nrow(dataset.raw[[max.mty]]) )
+
+      for(j in 1:length(dates)){
+
+        mat.tmp <- if( all(is.na(dataset.raw[[j]])) ){
+
+          rep(NA,ncol(mat.final) )
+
+        }else{
+
+          dataset.raw[[j]][ match(dataset.raw[[max.mty]][,1],dataset.raw[[j]][,1]), 2 ]
+
+        }
+
+        mat.final[j,] <- mat.tmp
+
+      }
+
+      colnames(mat.final) <- paste0("M",dataset.raw[[max.mty]][,1]*12)
+      rownames(mat.final) <- dates
+      ind <- apply(mat.final, 1, function(x) all(is.na(x)))
+      mat.final <- mat.final[ !ind, ]
+      return(mat.final)
+
+    }else{
+      message("Dataset not currently available. Try again later")
+      max.mty <- 1
+      mat.final <- matrix(NA, length(dates), max.mty )
+      #mat.final <- matrix(NA, length(dates), nrow(dataset.raw[[max.mty]]) )
+      rownames(mat.final) <- dates
+      return(mat.final)
+    }
+
   }
 
   # RU
 
   if ( ctry == "RU" ) {
+    message("Interpolation not available")
 
     if ( init < "2003-01-04" ) {
       stop(paste('\"init\" must be >= "2003-01-04" for Russian yield curves.',
@@ -161,30 +261,25 @@ yields = function (init,fin,mty,ctry) {
     if ( !identical(mty[mty < 3 | mty > 360], numeric(0)) ) {
       stop(paste0('argument \"mty\" must be between 3 and 360 months for ',ctry, ' yield curves'))
     }
-    mat <- matrix(NA,length(dates),(length(mty) + 1))
+    mat <- matrix(NA,length(dates),(length(mty.def) + 1))
+
     # Scraping
+
     i <- 1
     while ( i <= length(dates) ) {
       tmp <- httr::GET("https://www.cbr.ru/eng/hd_base/zcyc_params/", query = list(DateTo = dates[i]))
       data <- xml2::read_html(tmp) %>% rvest::html_nodes("table") %>% rvest::html_nodes("td") %>% rvest::html_text()
-      if ( data[1] == dates[i] ) {
-        if ( NA %in% match(mty,mty.def) ) {
-          # Spline
-          spl <- stats::smooth.spline( as.numeric(data[2:13]) ~ mty.def, all.knots = FALSE )
-          new <- stats::predict(spl, mty)
-          mat[i, 2:(length(mty) + 1) ] <- new$y
-          mat[i, 1] <- data[1]
-        } else {
-          mat[i,] <- c(data[1], data[2:13][match(mty,mty.def)])
-        }
-      }
+      mat[i,] <- data[1:13]
+      #pb = utils::txtProgressBar(min = (1/length(dates)), max = length(dates), style = 3)
+      #utils::setTxtProgressBar(pb,i)
       i <- i + 1
     }
     mat <- matrix(as.numeric(mat[,2:ncol(mat)]),nrow(mat),(ncol(mat)-1))
-    rownames(mat) <- format(seq(as.Date(init), as.Date(fin), 'day'), format="%d-%m-%Y", tz="UTC")
-    colnames(mat) <- paste0("M",mty)
+    rownames(mat) <- dates
+    colnames(mat) <- paste0("M",mty.def)
     mat <- stats::na.omit(mat)
     attributes(mat)$na.action <- NULL
+    mat <- mat[!duplicated(mat), ]
     return(mat)
   }
 }
